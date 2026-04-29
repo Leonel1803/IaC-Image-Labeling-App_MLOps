@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image Labeling Verifier</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Image Labeling Verifier</h1>
+
+    <section class="card">
+      <h2>Upload Image</h2>
+      <input id="fileInput" type="file" accept="image/*" />
+      <button id="uploadBtn">Upload</button>
+      <p id="uploadStatus"></p>
+    </section>
+
+    <section class="card">
+      <h2>Search by Label</h2>
+      <input id="labelInput" type="text" placeholder="Dog" />
+      <button id="searchBtn">Search</button>
+      <p id="searchStatus"></p>
+      <div id="results" class="results"></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

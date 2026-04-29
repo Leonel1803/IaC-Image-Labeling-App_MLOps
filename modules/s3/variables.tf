@@ -1,12 +1,12 @@
 variable "bucket_name" {
-    type = string
+  type = string
 }
 
 variable "environment" {
-    type = string
+  type = string
 }
 
 variable "transition_days" {
-    type = number
-    default = 30
+  type    = number
+  default = 30
 }

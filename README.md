@@ -622,4 +622,11 @@ Una historia está terminada si:
 
 ---
 
+# 20 Comprobación de Funcionamiento
+
+* Levantamos un servidor local (python -m http.server 5500)
+* Nos dirigimos a http://localhost:5500/web/
+* Subimos una imagen
+* Hacemos la busqueda relacionada con esa imagen
+
 Fin del documento.

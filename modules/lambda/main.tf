@@ -7,6 +7,7 @@ resource "aws_lambda_function" "image_labeler" {
   runtime          = var.runtime
   timeout          = var.timeout
   memory_size      = var.memory_size
+  tags             = var.tags
 
   environment {
     variables = merge({

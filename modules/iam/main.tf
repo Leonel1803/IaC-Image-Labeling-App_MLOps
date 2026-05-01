@@ -14,6 +14,7 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 resource "aws_iam_role" "lambda_exec" {
   name               = "${var.name_prefix}-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "basic_lambda_logs" {
@@ -48,7 +49,8 @@ data "aws_iam_policy_document" "lambda_access" {
       "dynamodb:PutItem",
       "dynamodb:BatchWriteItem",
       "dynamodb:Query",
-      "dynamodb:BatchGetItem"
+      "dynamodb:BatchGetItem",
+      "dynamodb:GetItem"
     ]
     resources = [
       var.dynamodb_table_arn,

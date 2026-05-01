@@ -1,6 +1,7 @@
-bucket_name            = "mlops-image-labeling-app-dev"
+bucket_name            = "mlops-image-labeling-app-dev-leotr-20260501"
 environment            = "dev"
 project_name           = "image-labeling"
 dynamodb_table_name    = "ImageIndex"
 lambda_source_path     = "lambda/processor_function.zip"
+lambda_handler         = "processor_handler.lambda_handler"
 api_lambda_source_path = "lambda/api_function.zip"

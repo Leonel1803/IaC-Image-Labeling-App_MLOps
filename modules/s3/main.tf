@@ -3,6 +3,7 @@
 ###################################
 resource "aws_s3_bucket" "images" {
   bucket = var.bucket_name
+  tags   = var.tags
 }
 
 ###################################
@@ -53,6 +54,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   }
 }
 
+resource "aws_s3_bucket_cors_configuration" "cors" {
+  bucket = aws_s3_bucket.images.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "HEAD"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
 ###################################
 # LIFECYCLE
 ###################################
@@ -78,4 +91,5 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
 resource "aws_s3_object" "images_prefix" {
   bucket = aws_s3_bucket.images.id
   key    = "images/"
+  tags   = var.tags
 }

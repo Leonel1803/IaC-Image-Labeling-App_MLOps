@@ -61,3 +61,4 @@ variable "api_lambda_source_path" {
   type    = string
   default = "lambda/api_function.zip"
 }
+

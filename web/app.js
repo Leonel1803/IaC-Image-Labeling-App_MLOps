@@ -14,14 +14,17 @@ function setStatus(element, text, isError = false) {
 }
 
 async function createUploadUrl(file) {
-  const response = await fetch(`${apiBase}/upload-url`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename: file.name, contentType: file.type })
+  const query = new URLSearchParams({
+    filename: file.name || "image.jpg",
+    contentType: file.type || "application/octet-stream"
+  });
+  const response = await fetch(`${apiBase}/upload-url?${query.toString()}`, {
+    method: "GET"
   });
 
   if (!response.ok) {
-    throw new Error("Could not create upload URL");
+    const errorText = await response.text();
+    throw new Error(`Could not create upload URL (${response.status}): ${errorText}`);
   }
 
   return response.json();
@@ -35,7 +38,8 @@ async function uploadFile(file, uploadUrl) {
   });
 
   if (!response.ok) {
-    throw new Error("Upload failed");
+    const errorText = await response.text();
+    throw new Error(`Upload failed (${response.status}): ${errorText}`);
   }
 }
 
@@ -88,7 +92,8 @@ searchBtn.addEventListener("click", async () => {
     setStatus(searchStatus, "Searching...");
     const response = await fetch(`${apiBase}/search?label=${encodeURIComponent(label)}`);
     if (!response.ok) {
-      throw new Error("Search failed");
+      const errorText = await response.text();
+      throw new Error(`Search failed (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();

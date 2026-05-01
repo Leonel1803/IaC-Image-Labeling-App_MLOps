@@ -22,8 +22,8 @@ resource "aws_dynamodb_table" "image_index" {
     enabled = true
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Environment = var.environment
     Name        = var.table_name
-  }
+  })
 }

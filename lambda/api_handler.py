@@ -22,26 +22,47 @@ def _response(status_code, payload):
 
 
 def _search(label):
-    result = table.query(
-        KeyConditionExpression=Key("PK").eq(f"LABEL#{label}"),
-    )
+    normalized = label.strip().lower()
+    candidate_labels = [normalized]
+    title_case = label.strip().title()
+    if title_case and title_case.lower() != normalized:
+        candidate_labels.append(title_case.lower())
 
-    image_items = result.get("Items", [])
+    image_items = []
+    seen_keys = set()
+    for candidate in candidate_labels:
+        result = table.query(
+            KeyConditionExpression=Key("PK").eq(f"LABEL#{candidate}"),
+        )
+        for item in result.get("Items", []):
+            compound = (item.get("PK"), item.get("SK"))
+            if compound in seen_keys:
+                continue
+            seen_keys.add(compound)
+            image_items.append(item)
+
     if not image_items:
         return []
+
     response_items = []
 
     for index_item in image_items:
         image_id = index_item.get("imageId")
         metadata_pk = index_item.get("SK")
-        metadata_result = table.get_item(
-            Key={"PK": metadata_pk, "SK": "METADATA"}
-        )
-        metadata_item = metadata_result.get("Item")
-        if not metadata_item:
+        if not metadata_pk:
             continue
 
-        s3_key = metadata_item["s3Key"]
+        metadata_result = table.query(
+            KeyConditionExpression=Key("PK").eq(metadata_pk) & Key("SK").eq("METADATA")
+        )
+        metadata_items = metadata_result.get("Items", [])
+        if not metadata_items:
+            continue
+        metadata_item = metadata_items[0]
+
+        s3_key = metadata_item.get("s3Key")
+        if not s3_key:
+            continue
         view_url = s3_client.generate_presigned_url(
             "get_object",
             Params={"Bucket": bucket_name, "Key": s3_key},
@@ -83,23 +104,27 @@ def _create_upload_url(filename, content_type):
 def lambda_handler(event, context):
     method = event.get("requestContext", {}).get("http", {}).get("method", "GET")
     raw_path = event.get("rawPath", "/")
+    path = raw_path.rstrip("/") or "/"
 
-    if method == "GET" and raw_path == "/health":
+    if method == "GET" and path in ("/", "/health"):
         return _response(200, {"ok": True})
 
-    if method == "GET" and raw_path == "/search":
+    if method == "GET" and path == "/search":
+        try:
+            query_params = event.get("queryStringParameters") or {}
+            label = unquote((query_params.get("label") or "").strip())
+            if not label:
+                return _response(400, {"error": "label is required"})
+
+            items = _search(label)
+            return _response(200, {"count": len(items), "items": items})
+        except Exception as error:
+            return _response(500, {"error": f"search failed: {str(error)}"})
+
+    if method == "GET" and path == "/upload-url":
         query_params = event.get("queryStringParameters") or {}
-        label = unquote((query_params.get("label") or "").strip())
-        if not label:
-            return _response(400, {"error": "label is required"})
-
-        items = _search(label)
-        return _response(200, {"count": len(items), "items": items})
-
-    if method == "POST" and raw_path == "/upload-url":
-        body = json.loads(event.get("body") or "{}")
-        filename = (body.get("filename") or "image.jpg").strip()
-        content_type = (body.get("contentType") or "application/octet-stream").strip()
+        filename = (query_params.get("filename") or "image.jpg").strip()
+        content_type = (query_params.get("contentType") or "application/octet-stream").strip()
 
         payload = _create_upload_url(filename, content_type)
         return _response(200, payload)

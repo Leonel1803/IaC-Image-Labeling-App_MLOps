@@ -55,12 +55,16 @@ def lambda_handler(event, context):
         if labels:
             with table.batch_writer() as batch:
                 for label in labels:
+                    normalized_label = label.strip().lower()
+                    if not normalized_label:
+                        continue
                     batch.put_item(
                         Item={
-                            "PK": f"LABEL#{label}",
+                            "PK": f"LABEL#{normalized_label}",
                             "SK": f"IMAGE#{image_id}",
                             "imageId": image_id,
                             "s3Key": key,
+                            "label": label,
                             "uploadedAt": uploaded_at,
                         }
                     )

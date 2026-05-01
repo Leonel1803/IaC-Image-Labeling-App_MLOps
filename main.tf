@@ -11,6 +11,13 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+    }
+  }
 }
 
 module "s3" {
@@ -18,12 +25,20 @@ module "s3" {
   bucket_name     = var.bucket_name
   environment     = var.environment
   transition_days = var.transition_days
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 module "dynamodb" {
   source      = "./modules/dynamodb"
   table_name  = var.dynamodb_table_name
   environment = var.environment
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 module "iam" {
@@ -31,6 +46,10 @@ module "iam" {
   name_prefix        = "${var.project_name}-${var.environment}"
   s3_bucket_arn      = module.s3.bucket_arn
   dynamodb_table_arn = module.dynamodb.table_arn
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 module "lambda" {
@@ -46,6 +65,10 @@ module "lambda" {
   confidence_threshold = var.confidence_threshold
   source_bucket_arn    = module.s3.bucket_arn
   allow_s3_invoke      = true
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 module "api_lambda" {
@@ -62,6 +85,10 @@ module "api_lambda" {
   environment_variables = {
     BUCKET_NAME = module.s3.bucket_name
   }
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 resource "aws_lambda_function_url" "api" {
@@ -70,10 +97,25 @@ resource "aws_lambda_function_url" "api" {
 
   cors {
     allow_origins = ["*"]
-    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_methods = ["GET", "POST"]
     allow_headers = ["*"]
     max_age       = 3600
   }
+}
+
+resource "aws_lambda_permission" "api_function_url_public" {
+  statement_id            = "AllowPublicFunctionUrlInvoke"
+  action                  = "lambda:InvokeFunctionUrl"
+  function_name           = module.api_lambda.function_name
+  principal               = "*"
+  function_url_auth_type  = "NONE"
+}
+
+resource "aws_lambda_permission" "api_function_url_public_invoke" {
+  statement_id            = "AllowPublicInvokeViaFunctionUrl"
+  action                  = "lambda:InvokeFunction"
+  function_name           = module.api_lambda.function_name
+  principal               = "*"
 }
 
 resource "aws_s3_bucket_notification" "image_created_to_lambda" {

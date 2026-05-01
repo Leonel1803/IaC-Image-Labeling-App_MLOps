@@ -14,3 +14,7 @@ variable "environment" {
   description = "Environment name"
   type        = string
 }
+
+variable "tags" {
+  type = map(string)
+}

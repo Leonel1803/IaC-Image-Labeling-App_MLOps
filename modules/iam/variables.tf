@@ -12,3 +12,7 @@ variable "dynamodb_table_arn" {
   description = "DynamoDB table ARN"
   type        = string
 }
+
+variable "tags" {
+  type = map(string)
+}

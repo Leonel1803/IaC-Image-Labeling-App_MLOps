@@ -1,0 +1,425 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.6",
+  "serial": 33,
+  "lineage": "c56b4d12-53f3-b33e-a045-2204f6f21d9c",
+  "outputs": {
+    "api_lambda_function_name": {
+      "value": "image-labeling-dev-api",
+      "type": "string"
+    },
+    "bucket_arn": {
+      "value": "arn:aws:s3:::mlops-image-labeling-app-dev",
+      "type": "string"
+    },
+    "bucket_name": {
+      "value": "mlops-image-labeling-app-dev",
+      "type": "string"
+    },
+    "dynamodb_table_name": {
+      "value": "ImageIndex",
+      "type": "string"
+    },
+    "lambda_function_name": {
+      "value": "image-labeling-dev-labeler",
+      "type": "string"
+    },
+    "lambda_role_name": {
+      "value": "image-labeling-dev-lambda-role",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "module": "module.iam",
+      "mode": "data",
+      "type": "aws_iam_policy_document",
+      "name": "lambda_assume_role",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "1604711841",
+            "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"lambda.amazonaws.com\"\n      }\n    }\n  ]\n}",
+            "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}]}",
+            "override_json": null,
+            "override_policy_documents": null,
+            "policy_id": null,
+            "source_json": null,
+            "source_policy_documents": null,
+            "statement": [
+              {
+                "actions": [
+                  "sts:AssumeRole"
+                ],
+                "condition": [],
+                "effect": "Allow",
+                "not_actions": [],
+                "not_principals": [],
+                "not_resources": [],
+                "principals": [
+                  {
+                    "identifiers": [
+                      "lambda.amazonaws.com"
+                    ],
+                    "type": "Service"
+                  }
+                ],
+                "resources": [],
+                "sid": ""
+              }
+            ],
+            "version": "2012-10-17"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "images",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::mlops-image-labeling-app-dev",
+            "bucket": "mlops-image-labeling-app-dev",
+            "bucket_domain_name": "mlops-image-labeling-app-dev.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "mlops-image-labeling-app-dev.s3.us-east-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "cb839e8f578ef6f83b4499d574d170356afb433d271ec82fd962beca8fb23ec8",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z3AQBSTGFYJSTF",
+            "id": "mlops-image-labeling-app-dev",
+            "lifecycle_rule": [
+              {
+                "abort_incomplete_multipart_upload_days": 0,
+                "enabled": true,
+                "expiration": [],
+                "id": "archive",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "images/",
+                "tags": {},
+                "transition": [
+                  {
+                    "date": "",
+                    "days": 30,
+                    "storage_class": "STANDARD_IA"
+                  }
+                ]
+              }
+            ],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "us-east-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Name": "leon.rivera@iteso.mx",
+              "Team": "team-4"
+            },
+            "tags_all": {
+              "Name": "leon.rivera@iteso.mx",
+              "Team": "team-4"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_lifecycle_configuration",
+      "name": "lifecycle",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "bucket": "mlops-image-labeling-app-dev",
+            "expected_bucket_owner": "",
+            "id": "mlops-image-labeling-app-dev",
+            "rule": [
+              {
+                "abort_incomplete_multipart_upload": [],
+                "expiration": [],
+                "filter": [
+                  {
+                    "and": [],
+                    "object_size_greater_than": null,
+                    "object_size_less_than": null,
+                    "prefix": "images/",
+                    "tag": []
+                  }
+                ],
+                "id": "archive",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "status": "Enabled",
+                "transition": [
+                  {
+                    "date": null,
+                    "days": 30,
+                    "storage_class": "STANDARD_IA"
+                  }
+                ]
+              }
+            ],
+            "timeouts": null,
+            "transition_default_minimum_object_size": "all_storage_classes_128K"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "ownership",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "mlops-image-labeling-app-dev",
+            "id": "mlops-image-labeling-app-dev",
+            "rule": [
+              {
+                "object_ownership": "BucketOwnerEnforced"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "mlops-image-labeling-app-dev",
+            "id": "mlops-image-labeling-app-dev",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "encryption",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "mlops-image-labeling-app-dev",
+            "expected_bucket_owner": "",
+            "id": "mlops-image-labeling-app-dev",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "",
+                    "sse_algorithm": "AES256"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "versioning",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "mlops-image-labeling-app-dev",
+            "expected_bucket_owner": "",
+            "id": "mlops-image-labeling-app-dev",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_object",
+      "name": "images_prefix",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acl": null,
+            "arn": "arn:aws:s3:::mlops-image-labeling-app-dev/images/",
+            "bucket": "mlops-image-labeling-app-dev",
+            "bucket_key_enabled": false,
+            "cache_control": "",
+            "checksum_algorithm": null,
+            "checksum_crc32": "",
+            "checksum_crc32c": "",
+            "checksum_crc64nvme": "",
+            "checksum_sha1": "",
+            "checksum_sha256": "",
+            "content": null,
+            "content_base64": null,
+            "content_disposition": "",
+            "content_encoding": "",
+            "content_language": "",
+            "content_type": "application/octet-stream",
+            "etag": "d41d8cd98f00b204e9800998ecf8427e",
+            "force_destroy": false,
+            "id": "images/",
+            "key": "images/",
+            "kms_key_id": null,
+            "metadata": {},
+            "object_lock_legal_hold_status": "",
+            "object_lock_mode": "",
+            "object_lock_retain_until_date": "",
+            "override_provider": [],
+            "server_side_encryption": "AES256",
+            "source": null,
+            "source_hash": null,
+            "storage_class": "STANDARD",
+            "tags": {},
+            "tags_all": {},
+            "version_id": "null",
+            "website_redirect": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.images"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": [
+    {
+      "object_kind": "var",
+      "config_addr": "var.name_tag",
+      "status": "pass",
+      "objects": [
+        {
+          "object_addr": "var.name_tag",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "object_kind": "var",
+      "config_addr": "var.team_tag",
+      "status": "pass",
+      "objects": [
+        {
+          "object_addr": "var.team_tag",
+          "status": "pass"
+        }
+      ]
+    }
+  ]
+}
